@@ -9,16 +9,14 @@ const balanceText = document.getElementById('balanceText');
 let balance = 0; // Initialize balance
 const spinCost = 25; // Cost per spin
 
-// Define segments and their corresponding colors
+// Define segments with an even distribution
 const segments = [
-    'Bonus', // 1x "Bonus"
-    '$100 Store Credit', '$100 Store Credit', // 2x "$100 Credit"
-    '$50 Store Credit', '$50 Store Credit', '$50 Store Credit', '$50 Store Credit', // 4x "$50 Credit"
-    '$25 Store Credit', '$25 Store Credit', '$25 Store Credit', '$25 Store Credit', '$25 Store Credit', '$25 Store Credit', // 6x "$25 Credit"
-    'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', 'ELYTEWEAR Stickers', // 8x "Stickers"
-    '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0', '$0' // 18x "$0"
+    '$0', 'ELYTEWEAR Stickers', '$25 Store Credit', '$0', '$50 Store Credit',
+    '$0', 'ELYTEWEAR Stickers', '$100 Store Credit', '$0', 'Bonus',
+    '$0', 'ELYTEWEAR Stickers', '$25 Store Credit', '$0', '$50 Store Credit',
+    '$0', 'ELYTEWEAR Stickers', '$100 Store Credit'
 ];
-const colors = segments.map((seg, index) => ['#FFC107', '#17A2B8', '#dc3545', '#007bff', '#28a745'][index % 5]);
+const colors = segments.map((_, index) => ['#FFC107', '#17A2B8', '#dc3545', '#007bff', '#28a745'][index % 5]);
 
 let currentAngle = 0;
 const sliceAngle = (2 * Math.PI) / segments.length;
@@ -30,14 +28,14 @@ function drawWheel() {
         ctx.beginPath();
         ctx.moveTo(250, 250);
         ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle);
-        ctx.lineTo(250, 250);
+        ctx.closePath();
         ctx.fill();
 
         ctx.fillStyle = 'white';
-        ctx.font = '12px Arial'; // Adjusted font size for readability
+        ctx.font = '14px Arial';
         ctx.translate(250, 250);
         ctx.rotate(currentAngle + sliceAngle / 2);
-        ctx.fillText(segment, 175, 0); // Adjusted text position
+        ctx.fillText(segment, 200, 0);
         ctx.rotate(-(currentAngle + sliceAngle / 2));
         ctx.translate(-250, -250);
 
@@ -67,13 +65,14 @@ function spinWheel() {
     balance -= spinCost; // Deduct the cost of one spin
     updateBalanceDisplay();
 
-    let startAngle = currentAngle;
-    let spinDuration = 7000; // Extended spin duration for added anticipation
+    let startAngle = currentAngle % (2 * Math.PI); // Normalize start angle
+    let spinDuration = 8000; // Extended spin duration for added anticipation
+    let endAngle = startAngle + 10 * Math.PI + Math.random() * 5 * Math.PI; // Randomize end angle for varied outcomes
 
     function animateSpin(time) {
         const elapsedTime = (time % spinDuration) / spinDuration;
-        const easeOut = 1 - Math.pow(1 - elapsedTime, 3); // Cubic ease-out
-        currentAngle = startAngle + easeOut * 20 * Math.PI; // Complete 20 full rotations
+        const easeOut = 1 - Math.pow(1 - elapsedTime, 3); // Cubic ease-out for smooth slowdown
+        currentAngle = startAngle + easeOut * (endAngle - startAngle);
 
         drawWheel();
 
@@ -85,27 +84,18 @@ function spinWheel() {
     }
 
     function finalizeSpin() {
-        const adjustedAngle = currentAngle % (2 * Math.PI);
-        const winningIndex = Math.floor((adjustedAngle / (2 * Math.PI)) * segments.length);
-        const winningSegment = segments[(segments.length - winningIndex) % segments.length];
+        const adjustedAngle = currentAngle % (2 * Math.PI); // Normalize final angle
+        const winningIndex = Math.floor(adjustedAngle / sliceAngle) % segments.length;
+        const winningSegment = segments[winningIndex];
         resultText.textContent = `You won ${winningSegment}!`;
 
-        // Handle winning logic, including bonus and store credits
-        if (winningSegment === 'Bonus') {
-            // Bonus can be any prize, including $1000
-            const bonusPrizes = ['$1000', ...segments.filter(prize => prize !== 'Bonus')];
-            const randomBonusIndex = Math.floor(Math.random() * bonusPrizes.length);
-            const bonusPrize = bonusPrizes[randomBonusIndex];
-            resultText.textContent += ` Bonus Prize: ${bonusPrize}!`;
-            if (bonusPrize.includes('$')) {
-                const amountWon = parseInt(bonusPrize.substring(1));
-                balance += amountWon; // Add winnings to balance if it's a store credit
-                updateBalanceDisplay();
-            }
-        } else if (winningSegment.includes('$')) {
-            const amountWon = parseInt(winningSegment.substring(1));
-            balance += amountWon; // Add winnings to balance if it's a store credit
+        // Handle special prizes and store credit winnings
+        if (winningSegment.includes('Store Credit')) {
+            const amountWon = parseInt(winningSegment.replace(/\D/g, ''));
+            balance += amountWon; // Add winnings to balance
             updateBalanceDisplay();
+        } else if (winningSegment === 'Bonus') {
+            // Handle Bonus prize logic here, potentially including the $1000 prize
         }
     }
 
@@ -124,6 +114,5 @@ submitCodeBtn.addEventListener('click', function() {
     }
 });
 
-// Initialize
-drawWheel();
-updateBalanceDisplay();
+drawWheel(); // Initial drawing of the wheel
+updateBalanceDisplay(); // Initial balance update
