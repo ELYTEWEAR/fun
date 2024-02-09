@@ -23,7 +23,7 @@ function drawWheel() {
         ctx.font = '20px Arial';
         ctx.translate(250, 250); // Move to the center
         ctx.rotate(currentAngle + sliceAngle / 2); // Rotate to the middle of the slice
-        ctx.fillText(segment, 200, 10); // Position the text 200px from the center, slightly adjusted for better alignment
+        ctx.fillText(segment, 200, 10); // Position the text 200px from the center
         ctx.rotate(-(currentAngle + sliceAngle / 2)); // Rotate back
         ctx.translate(-250, -250); // Move back to the original position
 
@@ -44,11 +44,9 @@ function spinWheel() {
     spinBtn.disabled = true;
     let spinDuration = 4000 + Math.random() * 2000; // Spin duration between 4 and 6 seconds
     let startTimestamp;
+    let startAngle = currentAngle;
 
-    const easeOut = (t) => {
-        // Easing function for a more dramatic slowdown
-        return 1 - Math.pow(1 - t, 3);
-    };
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3); // Easing function for a more dramatic slowdown
 
     const animateSpin = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;
@@ -56,17 +54,18 @@ function spinWheel() {
         const progress = Math.min(elapsedTime / spinDuration, 1); // Ensure progress goes from 0 to 1
         const easeProgress = easeOut(progress);
 
-        currentAngle = easeProgress * 25 * 2 * Math.PI; // Complete spins: 25 full rotations
+        currentAngle = startAngle + easeProgress * 25 * 2 * Math.PI; // Complete spins: 25 full rotations
         drawWheel();
 
         if (progress < 1) {
             requestAnimationFrame(animateSpin);
         } else {
-            // Determine the winning segment
-            const winningIndex = Math.floor(((currentAngle / sliceAngle) + segments.length) % segments.length);
-            const winningSegment = segments[winningIndex];
-            resultText.textContent = `Congratulations! You won ${winningSegment}!`;
             spinBtn.disabled = false;
+            // Correctly determine the winning segment
+            const adjustedAngle = currentAngle % (2 * Math.PI);
+            const winningIndex = Math.floor((adjustedAngle / (2 * Math.PI)) * segments.length);
+            const winningSegment = segments[(segments.length - winningIndex) % segments.length];
+            resultText.textContent = `Congratulations! You won ${winningSegment}!`;
         }
     };
 
