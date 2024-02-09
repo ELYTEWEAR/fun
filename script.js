@@ -13,59 +13,63 @@ function drawWheel() {
     segments.forEach((segment, index) => {
         ctx.fillStyle = colors[index % colors.length];
         ctx.beginPath();
-        ctx.moveTo(250, 250); // Move to the center
-        ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle); // Draw the arc
-        ctx.closePath();
+        ctx.moveTo(250, 250); // Center of the wheel
+        ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle); // Draw the segment
+        ctx.lineTo(250, 250);
         ctx.fill();
 
-        // Text
+        // Draw the text
         ctx.fillStyle = 'white';
         ctx.font = '20px Arial';
-        ctx.translate(250, 250); // Move to the center
-        ctx.rotate(currentAngle + sliceAngle / 2); // Rotate to the middle of the slice
-        ctx.fillText(segment, 200, 10); // Position the text 200px from the center
-        ctx.rotate(-(currentAngle + sliceAngle / 2)); // Rotate back
-        ctx.translate(-250, -250); // Move back to the original position
+        ctx.translate(250, 250);
+        ctx.rotate(currentAngle + sliceAngle / 2);
+        ctx.fillText(segment, 200, 10);
+        ctx.rotate(-(currentAngle + sliceAngle / 2));
+        ctx.translate(-250, -250);
 
-        currentAngle += sliceAngle; // Move to the next segment
+        currentAngle += sliceAngle;
     });
 
-    // Draw the arrow
+    // Draw the arrow at the top
     ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.moveTo(250, 5); // Top of the arrow
-    ctx.lineTo(240, 30); // Bottom left
-    ctx.lineTo(260, 30); // Bottom right
+    ctx.moveTo(250 - 10, 10); // Left side of the arrow
+    ctx.lineTo(250 + 10, 10); // Right side of the arrow
+    ctx.lineTo(250, 10 + 20); // Arrow tip
     ctx.closePath();
     ctx.fill();
 }
 
 function spinWheel() {
     spinBtn.disabled = true;
-    let spinDuration = 4000 + Math.random() * 2000; // Spin duration between 4 and 6 seconds
-    let startTimestamp;
+    let spinTime = 0;
     let startAngle = currentAngle;
+    let spinAnimation;
 
-    const easeOut = (t) => 1 - Math.pow(1 - t, 3); // Easing function for a more dramatic slowdown
+    const easeOutQuad = (t) => t * (2 - t);
+    const spinDuration = 5000; // Duration in milliseconds for the spin to stop
 
     const animateSpin = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const elapsedTime = timestamp - startTimestamp;
-        const progress = Math.min(elapsedTime / spinDuration, 1); // Ensure progress goes from 0 to 1
-        const easeProgress = easeOut(progress);
+        if (!spinTime) spinTime = timestamp;
+        const elapsedTime = timestamp - spinTime;
+        const progress = Math.min(elapsedTime / spinDuration, 1);
+        const easeProgress = easeOutQuad(progress);
 
-        currentAngle = startAngle + easeProgress * 25 * 2 * Math.PI; // Complete spins: 25 full rotations
+        currentAngle = startAngle + easeProgress * 25 * 2 * Math.PI; // 25 full rotations for a long spin
+
         drawWheel();
 
         if (progress < 1) {
-            requestAnimationFrame(animateSpin);
+            spinAnimation = requestAnimationFrame(animateSpin);
         } else {
+            cancelAnimationFrame(spinAnimation);
             spinBtn.disabled = false;
-            // Correctly determine the winning segment
-            const adjustedAngle = currentAngle % (2 * Math.PI);
-            const winningIndex = Math.floor((adjustedAngle / (2 * Math.PI)) * segments.length);
-            const winningSegment = segments[(segments.length - winningIndex) % segments.length];
-            resultText.textContent = `Congratulations! You won ${winningSegment}!`;
+            // Determine the winning segment
+            const totalSegments = segments.length;
+            const adjustedAngle = currentAngle % (2 * Math.PI); // Normalize the angle
+            const segmentAngle = 2 * Math.PI / totalSegments;
+            const winningIndex = Math.floor((adjustedAngle + segmentAngle / 2) / segmentAngle) % totalSegments;
+            resultText.textContent = `Congratulations! You won ${segments[winningIndex]}!`;
         }
     };
 
@@ -73,4 +77,4 @@ function spinWheel() {
 }
 
 spinBtn.addEventListener('click', spinWheel);
-drawWheel(); // Initial draw
+drawWheel(); // Initial drawing of the wheel
