@@ -24,25 +24,23 @@ const sliceAngle = (2 * Math.PI) / segments.length;
 
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    currentAngle = 0; // Reset current angle for redrawing
 
     segments.forEach((segment, index) => {
         ctx.fillStyle = colors[index];
         ctx.beginPath();
         ctx.moveTo(250, 250);
-        ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle);
-        ctx.closePath();
+        ctx.arc(250, 250, 250, currentAngle + index * sliceAngle, currentAngle + (index + 1) * sliceAngle);
+        ctx.lineTo(250, 250);
         ctx.fill();
 
+        // Draw text
         ctx.fillStyle = 'white';
         ctx.font = '14px Arial';
         ctx.translate(250, 250);
-        ctx.rotate(currentAngle + sliceAngle / 2);
-        ctx.fillText(segment, 200, 0);
-        ctx.rotate(-(currentAngle + sliceAngle / 2));
+        ctx.rotate(currentAngle + (index + 0.5) * sliceAngle);
+        ctx.fillText(segment, 130, 10);
+        ctx.rotate(-(currentAngle + (index + 0.5) * sliceAngle));
         ctx.translate(-250, -250);
-
-        currentAngle += sliceAngle;
     });
 
     // Draw the arrow
@@ -60,48 +58,50 @@ function updateBalanceDisplay() {
 }
 
 function spinWheel() {
-    if (isSpinning) return; // Prevent additional spins if already spinning
-    if (balance < spinCost) {
-        alert("Insufficient balance. Please load more credits.");
+    if (isSpinning || balance < spinCost) {
+        alert("Cannot spin now. Check if the wheel is already spinning or if the balance is insufficient.");
         return;
     }
 
-    isSpinning = true; // Set spinning flag
     balance -= spinCost; // Deduct the cost of one spin
     updateBalanceDisplay();
+    isSpinning = true; // Set spinning flag
 
-    let spinDuration = 8000; // Spin duration
-    let endAngle = currentAngle + 10 * Math.PI + Math.random() * 5 * Math.PI; // Calculate end angle
+    const spinDuration = 8000; // Spin duration in milliseconds
+    const spins = Math.random() * 5 + 10; // Random number of spins between 10 and 15
+    const totalSpinAngle = spins * 2 * Math.PI; // Total spin angle
+    const startAngle = currentAngle; // Starting angle
 
     function animateSpin(timeStart) {
         let timeElapsed = Date.now() - timeStart;
         let progress = timeElapsed / spinDuration;
-        let easeOutProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease-out
 
         if (progress < 1) {
-            currentAngle += easeOutProgress * (endAngle - currentAngle);
+            // Ease out effect
+            let easeOutProgress = 1 - Math.pow(1 - progress, 3);
+            currentAngle = startAngle + easeOutProgress * totalSpinAngle;
             drawWheel();
             requestAnimationFrame(() => animateSpin(timeStart));
         } else {
-            currentAngle = endAngle;
+            // Finalize spin
+            currentAngle = startAngle + totalSpinAngle;
+            currentAngle %= 2 * Math.PI; // Normalize angle
+            drawWheel();
             finalizeSpin();
             isSpinning = false; // Reset spinning flag
         }
     }
 
     function finalizeSpin() {
-        const adjustedAngle = currentAngle % (2 * Math.PI); // Normalize final angle
-        const winningIndex = Math.floor(adjustedAngle / sliceAngle) % segments.length;
+        const winningIndex = Math.floor(currentAngle / sliceAngle) % segments.length;
         const winningSegment = segments[winningIndex];
         resultText.textContent = `You won ${winningSegment}!`;
 
-        // Handle special prizes and store credit winnings
+        // Update balance if won store credit
         if (winningSegment.includes('Store Credit')) {
-            const amountWon = parseInt(winningSegment.replace(/\D/g, ''));
-            balance += amountWon; // Add winnings to balance
+            const amountWon = parseInt(winningSegment.replace(/\D/g, ''), 10);
+            balance += amountWon;
             updateBalanceDisplay();
-        } else if (winningSegment === 'Bonus') {
-            // Implement Bonus prize logic here
         }
     }
 
