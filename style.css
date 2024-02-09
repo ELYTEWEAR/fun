@@ -16,3 +16,10 @@ body {
     font-size: 16px;
     cursor: pointer;
 }
+.wheel-container {
+  position: relative;
+}
+
+#wheelCanvas {
+  margin-top: 40px; // Make room for the arrow above the wheel
+}
