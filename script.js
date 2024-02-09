@@ -67,23 +67,22 @@ function spinWheel() {
     updateBalanceDisplay();
     isSpinning = true; // Set spinning flag
 
-    const spinDuration = 5000; // Reduce spin duration to ensure it stops properly
-    const spins = Math.random() * 2 + 3; // Fewer spins to ensure it stops
+    const spinDuration = 5000; // Spin duration in milliseconds
+    const spins = Math.random() * 2 + 3; // Random number of spins
     const totalSpinAngle = spins * 2 * Math.PI; // Total spin angle
     const startAngle = currentAngle; // Starting angle
+    const startTime = performance.now(); // Start time for the animation
 
-    function animateSpin(timeStart) {
-        let timeElapsed = Date.now() - timeStart;
+    function animateSpin(timestamp) {
+        let timeElapsed = timestamp - startTime;
         let progress = timeElapsed / spinDuration;
 
         if (progress < 1) {
-            // Ease out effect
-            let easeOutProgress = 1 - Math.pow(1 - progress, 3);
+            let easeOutProgress = 1 - Math.pow(1 - progress, 3); // Ease out effect
             currentAngle = startAngle + easeOutProgress * totalSpinAngle;
             drawWheel();
-            requestAnimationFrame(() => animateSpin(timeStart));
+            requestAnimationFrame(animateSpin);
         } else {
-            // Finalize spin
             currentAngle = startAngle + totalSpinAngle;
             currentAngle %= 2 * Math.PI; // Normalize angle
             drawWheel();
@@ -92,7 +91,7 @@ function spinWheel() {
         }
     }
 
-    requestAnimationFrame((timestamp) => animateSpin(timestamp));
+    requestAnimationFrame(animateSpin);
 }
 
 function finalizeSpin() {
