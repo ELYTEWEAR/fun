@@ -102,6 +102,9 @@ function spinWheel() {
     requestAnimationFrame(animateSpin);
 }
 
+// Added event listener for the spin button
+spinBtn.addEventListener('click', spinWheel);
+
 submitCodeBtn.addEventListener('click', function() {
     const code = codeInput.value.trim().toLowerCase();
     if (code === "money") {
