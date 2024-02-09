@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinning Wheel Game</title>
+    <title>ELYTEWEAR Spin & Win</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="main-container">
+        <header>
+            <h1>ELYTEWEAR Exclusive Spin & Win</h1>
+            <p>Take a chance and spin the wheel for your ELYTE reward!</p>
+        </header>
 
-<div class="wheel-container">
-    <canvas id="wheelCanvas" width="500" height="500"></canvas>
-    <button id="spinBtn">Spin the Wheel</button>
-</div>
+        <div class="wheel-container">
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+            <div class="spinner"></div>
+        </div>
 
-<script src="script.js"></script>
+        <button id="spinBtn" class="spin-btn">Spin the Wheel</button>
+        <div id="resultText" class="result-text"></div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
