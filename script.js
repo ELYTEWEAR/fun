@@ -1,19 +1,16 @@
 const canvas = document.getElementById('wheelCanvas');
 const ctx = canvas.getContext('2d');
 const spinBtn = document.getElementById('spinBtn');
+const loadMoneyBtn = document.getElementById('loadMoneyBtn');
 const resultText = document.getElementById('resultText');
-const balanceText = document.getElementById('balanceText'); // Add a balance display element in your HTML
+const balanceText = document.getElementById('balanceText');
 
-let balance = 0; // Starting balance
-const segments = ['ELYTE HOODIE', '$0', '$50', '$75', 'Mystery'];
-const colors = ['#FFD700', '#ADFF2F', '#FF4500', '#1E90FF', '#FF69B4'];
+let balance = 150; // Initial balance
+const spinCost = 25; // Cost per spin
+const segments = ['Bonus', '$0', 'ELYTE STICKER', '$100', '$0', 'Bonus', '$0', '$25', '$0', '$50'];
+const colors = ['#ff4d4d', '#4da6ff', '#e6e600', '#ff4d4d', '#4da6ff', '#e6e600', '#ff4d4d', '#4da6ff', '#e6e600', '#ff4d4d'];
 let currentAngle = 0;
 const sliceAngle = (2 * Math.PI) / segments.length;
-
-function updateBalance(amount) {
-    balance += amount;
-    balanceText.textContent = `Balance: $${balance}`;
-}
 
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -26,7 +23,7 @@ function drawWheel() {
         ctx.fill();
 
         ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
+        ctx.font = '16px Arial';
         ctx.translate(250, 250);
         ctx.rotate(currentAngle + sliceAngle / 2);
         ctx.fillText(segment, 200, 10);
@@ -36,58 +33,77 @@ function drawWheel() {
         currentAngle += sliceAngle;
     });
 
+    // Arrow
     ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.moveTo(250 - 10, 10);
-    ctx.lineTo(250 + 10, 10);
-    ctx.lineTo(250, 30);
+    ctx.moveTo(250, 0);
+    ctx.lineTo(230, 30);
+    ctx.lineTo(270, 30);
     ctx.closePath();
     ctx.fill();
 }
 
+function updateBalanceDisplay() {
+    balanceText.textContent = `Balance: $${balance}`;
+}
+
 function spinWheel() {
-    spinBtn.disabled = true;
-    let spinDuration = 4000 + Math.random() * 1000; // Spin duration between 4 and 5 seconds
-    let startTimestamp;
+    if (balance < spinCost) {
+        alert("Not enough balance. Please load more money.");
+        return;
+    }
+    balance -= spinCost;
+    updateBalanceDisplay();
+
+    let spinTime = 0;
+    let spinDuration = Math.random() * 3000 + 2000; // Spin for 2-5 seconds
     let startAngle = currentAngle;
-    let endAngle = startAngle + Math.random() * 5 * 2 * Math.PI; // Random end angle for varied outcomes
+    let endAngle = startAngle + Math.random() * 10 * Math.PI + 5 * Math.PI; // Ensure at least 5 full rotations
 
-    const animateSpin = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const elapsedTime = timestamp - startTimestamp;
-        const progress = elapsedTime / spinDuration;
+    function animateSpin() {
+        const frame = (timestamp) => {
+            if (!spinTime) spinTime = timestamp;
+            const progress = (timestamp - spinTime) / spinDuration;
 
-        if (progress < 1) {
-            currentAngle = startAngle + easeOutQuad(progress) * (endAngle - startAngle);
-            drawWheel();
-            requestAnimationFrame(animateSpin);
-        } else {
-            finalAdjustment(); // Adjust the final position to weight towards smaller prizes
-        }
-    };
-
-    requestAnimationFrame(animateSpin);
-}
-
-function easeOutQuad(t) {
-    return t * (2 - t);
-}
-
-function finalAdjustment() {
-    const mysteryPrizes = ['$0', '$50', '$75', 'ELYTE HOODIE', '$1000']; // Including the rare $1000 prize
-    let finalSegment = segments[Math.floor(((currentAngle + Math.PI / segments.length) % (2 * Math.PI)) / sliceAngle) % segments.length];
-
-    if (finalSegment === 'Mystery') {
-        finalSegment = mysteryPrizes[Math.floor(Math.pow(Math.random(), 3) * mysteryPrizes.length)]; // Skew towards lower-value prizes
+            if (progress < 1) {
+                currentAngle = startAngle + easeOut(progress) * (endAngle - startAngle);
+                drawWheel();
+                requestAnimationFrame(frame);
+            } else {
+                finalizeSpin();
+            }
+        };
+        requestAnimationFrame(frame);
     }
 
-    // Update the balance based on the prize won
-    const prizeAmount = finalSegment === 'ELYTE HOODIE' ? 0 : (finalSegment === 'Mystery' ? (finalSegment === '$1000' ? 1000 : 0) : parseInt(finalSegment.replace('$', ''), 10));
-    updateBalance(prizeAmount);
+    function finalizeSpin() {
+        const winningIndex = Math.floor(((currentAngle / sliceAngle) + 0.5) % segments.length);
+        const winningSegment = segments[winningIndex];
+        resultText.textContent = `You won ${winningSegment}!`;
 
-    resultText.textContent = `Congratulations! You won ${finalSegment}!`;
-    spinBtn.disabled = false;
+        if (winningSegment.includes('$')) {
+            const amountWon = parseInt(winningSegment.substring(1));
+            balance += amountWon;
+            updateBalanceDisplay();
+        } else if (winningSegment === 'Bonus') {
+            // Implement bonus prize logic here
+        }
+    }
+
+    function easeOut(t) {
+        return t * (2 - t);
+    }
+
+    animateSpin();
+}
+
+function loadMoney() {
+    balance += 150;
+    updateBalanceDisplay();
 }
 
 spinBtn.addEventListener('click', spinWheel);
-drawWheel(); // Initial drawing of the wheel
+loadMoneyBtn.addEventListener('click', loadMoney);
+
+drawWheel();
+updateBalanceDisplay();
