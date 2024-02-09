@@ -4,114 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELYTEWEAR Spin & Win</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-            font-family: 'Montserrat', sans-serif;
-        }
-        .wheel-container {
-            position: relative;
-            text-align: center;
-        }
-        canvas {
-            margin-top: 40px; /* Make room for the arrow above the wheel */
-        }
-        #spinBtn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #resultText {
-            margin-top: 20px;
-            font-size: 20px;
-        }
-        .arrow {
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-bottom: 40px solid #333;
-            position: absolute;
-            top: -40px; /* Adjust this value to position the arrow right above the wheel */
-            left: 50%;
-            margin-left: -20px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="wheel-container">
-        <div class="arrow"></div> <!-- Arrow above the wheel -->
-        <canvas id="wheelCanvas" width="500" height="500"></canvas>
-        <button id="spinBtn">Spin the Wheel</button>
-        <div id="resultText"></div>
+    <div class="main-container">
+        <header>
+            <h1>ELYTEWEAR Exclusive Spin & Win</h1>
+            <p>Take a chance and spin the wheel for your ELYTE reward!</p>
+        </header>
+
+        <div class="wheel-container">
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+            <div class="arrow" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);">&gt;</div>
+        </div>
+
+        <button id="spinBtn" class="spin-btn">Spin the Wheel</button>
+        <div id="resultText" class="result-text"></div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const resultText = document.getElementById('resultText');
-
-        const segments = ['ELYTE HOODIE', '$0', '$50', '$75', 'Bonus Prize'];
-        const colors = ['#FFD700', '#ADFF2F', '#FF4500', '#1E90FF', '#FF69B4'];
-
-        let currentAngle = 0;
-        const sliceAngle = (2 * Math.PI) / segments.length;
-
-        function drawWheel() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < segments.length; i++) {
-                ctx.beginPath();
-                ctx.moveTo(250, 250); // Center of the canvas
-                ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle);
-                ctx.fillStyle = colors[i];
-                ctx.fill();
-
-                // Add text labels
-                ctx.save();
-                ctx.translate(250, 250);
-                ctx.rotate(currentAngle + sliceAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = 'white';
-                ctx.font = '18px Arial';
-                ctx.fillText(segments[i], 230, 10);
-                ctx.restore();
-
-                currentAngle += sliceAngle;
-            }
-        }
-
-        function spinWheel() {
-            spinBtn.disabled = true;
-            resultText.innerText = '';
-            let spinTime = 0;
-            const spinTotalTime = Math.random() * 5000 + 10000; // Between 10 and 15 seconds
-
-            const spinAnimation = setInterval(() => {
-                spinTime += 30;
-                currentAngle += sliceAngle / 75; // Spin increment
-                drawWheel();
-
-                if (spinTime >= spinTotalTime) {
-                    clearInterval(spinAnimation);
-                    spinBtn.disabled = false;
-                    // Determine the prize
-                    const winningIndex = Math.floor(prizes.length - (currentAngle / (2 * Math.PI)) % prizes.length) % prizes.length;
-                    resultText.innerText = `Congratulations! You've won ${segments[winningIndex]}`;
-                }
-            }, 30);
-        }
-
-        spinBtn.addEventListener('click', spinWheel);
-
-        // Initial draw of the wheel
-        drawWheel();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
