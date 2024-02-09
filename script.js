@@ -5,70 +5,73 @@ const resultText = document.getElementById('resultText');
 
 const segments = ['ELYTE HOODIE', '$0', '$50', '$75', 'Free Stickers'];
 const colors = ['#FFD700', '#ADFF2F', '#FF4500', '#1E90FF', '#FF69B4'];
-const arrowColor = '#333';
-
 let currentAngle = 0;
 const sliceAngle = (2 * Math.PI) / segments.length;
 
 function drawWheel() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < segments.length; i++) {
-        ctx.fillStyle = colors[i];
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for redrawing
+    segments.forEach((segment, index) => {
+        ctx.fillStyle = colors[index % colors.length];
         ctx.beginPath();
-        ctx.moveTo(250, 250);
-        ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle);
-        ctx.lineTo(250, 250);
+        ctx.moveTo(250, 250); // Move to the center
+        ctx.arc(250, 250, 250, currentAngle, currentAngle + sliceAngle); // Draw the arc
+        ctx.closePath();
         ctx.fill();
 
+        // Text
         ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.font = '18px Arial';
-        ctx.fillText(segments[i], 250 + Math.cos(currentAngle + sliceAngle / 2) * 200, 250 + Math.sin(currentAngle + sliceAngle / 2) * 200);
-        currentAngle += sliceAngle;
-    }
+        ctx.font = '20px Arial';
+        ctx.translate(250, 250); // Move to the center
+        ctx.rotate(currentAngle + sliceAngle / 2); // Rotate to the middle of the slice
+        ctx.fillText(segment, 200, 10); // Position the text 200px from the center, slightly adjusted for better alignment
+        ctx.rotate(-(currentAngle + sliceAngle / 2)); // Rotate back
+        ctx.translate(-250, -250); // Move back to the original position
+
+        currentAngle += sliceAngle; // Move to the next segment
+    });
 
     // Draw the arrow
-    ctx.fillStyle = arrowColor;
+    ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.moveTo(250, 20);
-    ctx.lineTo(240, 40);
-    ctx.lineTo(260, 40);
+    ctx.moveTo(250, 5); // Top of the arrow
+    ctx.lineTo(240, 30); // Bottom left
+    ctx.lineTo(260, 30); // Bottom right
     ctx.closePath();
     ctx.fill();
 }
 
 function spinWheel() {
     spinBtn.disabled = true;
-    let spinTime = 0;
-    let startAngle = currentAngle;
-    let spinAnimation;
+    let spinDuration = 4000 + Math.random() * 2000; // Spin duration between 4 and 6 seconds
+    let startTimestamp;
 
-    const easeOutQuad = t => t * (2 - t);
-    const duration = 5000; // Duration of the spin
+    const easeOut = (t) => {
+        // Easing function for a more dramatic slowdown
+        return 1 - Math.pow(1 - t, 3);
+    };
 
-    const spin = timestamp => {
-        if (!spinTime) { spinTime = timestamp; }
-        const progress = Math.min((timestamp - spinTime) / duration, 1);
-        const easeProgress = easeOutQuad(progress);
+    const animateSpin = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const elapsedTime = timestamp - startTimestamp;
+        const progress = Math.min(elapsedTime / spinDuration, 1); // Ensure progress goes from 0 to 1
+        const easeProgress = easeOut(progress);
 
-        currentAngle = startAngle + easeProgress * 25 * Math.PI; // 25 full spins
+        currentAngle = easeProgress * 25 * 2 * Math.PI; // Complete spins: 25 full rotations
         drawWheel();
 
         if (progress < 1) {
-            spinAnimation = requestAnimationFrame(spin);
+            requestAnimationFrame(animateSpin);
         } else {
-            cancelAnimationFrame(spinAnimation);
+            // Determine the winning segment
+            const winningIndex = Math.floor(((currentAngle / sliceAngle) + segments.length) % segments.length);
+            const winningSegment = segments[winningIndex];
+            resultText.textContent = `Congratulations! You won ${winningSegment}!`;
             spinBtn.disabled = false;
-            // Determine the prize
-            const winningIndex = Math.floor(segments.length - (currentAngle / (2 * Math.PI)) % segments.length) % segments.length;
-            resultText.textContent = `Congratulations! You won ${segments[winningIndex]}!`;
         }
     };
 
-    requestAnimationFrame(spin);
+    requestAnimationFrame(animateSpin);
 }
 
 spinBtn.addEventListener('click', spinWheel);
-
-// Initial draw of the wheel
-drawWheel();
+drawWheel(); // Initial draw
