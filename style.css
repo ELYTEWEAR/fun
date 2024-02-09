@@ -23,3 +23,44 @@ body {
 #wheelCanvas {
   margin-top: 40px; // Make room for the arrow above the wheel
 }
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    max-width: 700px;
+}
+
+.wheel-container {
+    margin: 0 auto;
+    position: relative;
+}
+
+.arrow {
+    color: #333;
+    font-size: 30px;
+    font-weight: bold;
+    user-select: none;
+}
+
+#resultText {
+    font-size: 24px;
+    color: #28a745; /* Success color */
+}
+
+#balanceText {
+    font-size: 20px;
+    color: #007bff; /* Primary color */
+}
+
+#spinBtn {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+#spinBtn:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
