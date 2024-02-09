@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELYTEWEAR Spin & Win</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-container">
-        <header>
-            <h1>ELYTEWEAR Exclusive Spin & Win</h1>
-            <p>Take a chance and spin the wheel for your ELYTE reward!</p>
-        </header>
+    <div class="container text-center my-5">
+        <h1 class="mb-4">ELYTEWEAR Exclusive Spin & Win</h1>
+        <p class="lead mb-5">Try your luck and win amazing prizes, including the coveted ELYTE HOODIE!</p>
 
-        <div class="wheel-container">
+        <div class="wheel-container mx-auto" style="position: relative;">
             <canvas id="wheelCanvas" width="500" height="500"></canvas>
-            <div class="arrow" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);">&gt;</div>
+            <div class="arrow" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%) rotate(180deg);">&gt;</div>
         </div>
 
-        <button id="spinBtn" class="spin-btn">Spin the Wheel</button>
-        <div id="resultText" class="result-text"></div>
+        <button id="spinBtn" class="btn btn-primary btn-lg mt-4">Spin the Wheel</button>
+        <div id="resultText" class="result-text mt-3"></div>
+        <div id="balanceText" class="balance-text mt-3">Balance: $0</div>
     </div>
 
     <script src="script.js"></script>
