@@ -8,6 +8,7 @@ const balanceText = document.getElementById('balanceText');
 
 let balance = 0; // Initialize balance
 const spinCost = 25; // Cost per spin
+let isSpinning = false; // Flag to prevent spinning when already in progress
 
 // Define segments with an even distribution
 const segments = [
@@ -23,6 +24,8 @@ const sliceAngle = (2 * Math.PI) / segments.length;
 
 function drawWheel() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    currentAngle = 0; // Reset current angle for redrawing
+
     segments.forEach((segment, index) => {
         ctx.fillStyle = colors[index];
         ctx.beginPath();
@@ -57,29 +60,32 @@ function updateBalanceDisplay() {
 }
 
 function spinWheel() {
+    if (isSpinning) return; // Prevent additional spins if already spinning
     if (balance < spinCost) {
         alert("Insufficient balance. Please load more credits.");
         return;
     }
 
+    isSpinning = true; // Set spinning flag
     balance -= spinCost; // Deduct the cost of one spin
     updateBalanceDisplay();
 
-    let startAngle = currentAngle % (2 * Math.PI); // Normalize start angle
-    let spinDuration = 8000; // Extended spin duration for added anticipation
-    let endAngle = startAngle + 10 * Math.PI + Math.random() * 5 * Math.PI; // Randomize end angle for varied outcomes
+    let spinDuration = 8000; // Spin duration
+    let endAngle = currentAngle + 10 * Math.PI + Math.random() * 5 * Math.PI; // Calculate end angle
 
-    function animateSpin(time) {
-        const elapsedTime = (time % spinDuration) / spinDuration;
-        const easeOut = 1 - Math.pow(1 - elapsedTime, 3); // Cubic ease-out for smooth slowdown
-        currentAngle = startAngle + easeOut * (endAngle - startAngle);
+    function animateSpin(timeStart) {
+        let timeElapsed = Date.now() - timeStart;
+        let progress = timeElapsed / spinDuration;
+        let easeOutProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease-out
 
-        drawWheel();
-
-        if (elapsedTime < 1) {
-            requestAnimationFrame(animateSpin);
+        if (progress < 1) {
+            currentAngle += easeOutProgress * (endAngle - currentAngle);
+            drawWheel();
+            requestAnimationFrame(() => animateSpin(timeStart));
         } else {
+            currentAngle = endAngle;
             finalizeSpin();
+            isSpinning = false; // Reset spinning flag
         }
     }
 
@@ -95,14 +101,13 @@ function spinWheel() {
             balance += amountWon; // Add winnings to balance
             updateBalanceDisplay();
         } else if (winningSegment === 'Bonus') {
-            // Handle Bonus prize logic here, potentially including the $1000 prize
+            // Implement Bonus prize logic here
         }
     }
 
-    requestAnimationFrame(animateSpin);
+    requestAnimationFrame((timestamp) => animateSpin(timestamp));
 }
 
-// Added event listener for the spin button
 spinBtn.addEventListener('click', spinWheel);
 
 submitCodeBtn.addEventListener('click', function() {
