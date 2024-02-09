@@ -67,8 +67,8 @@ function spinWheel() {
     updateBalanceDisplay();
     isSpinning = true; // Set spinning flag
 
-    const spinDuration = 8000; // Spin duration in milliseconds
-    const spins = Math.random() * 5 + 10; // Random number of spins between 10 and 15
+    const spinDuration = 5000; // Reduce spin duration to ensure it stops properly
+    const spins = Math.random() * 2 + 3; // Fewer spins to ensure it stops
     const totalSpinAngle = spins * 2 * Math.PI; // Total spin angle
     const startAngle = currentAngle; // Starting angle
 
@@ -92,20 +92,20 @@ function spinWheel() {
         }
     }
 
-    function finalizeSpin() {
-        const winningIndex = Math.floor(currentAngle / sliceAngle) % segments.length;
-        const winningSegment = segments[winningIndex];
-        resultText.textContent = `You won ${winningSegment}!`;
-
-        // Update balance if won store credit
-        if (winningSegment.includes('Store Credit')) {
-            const amountWon = parseInt(winningSegment.replace(/\D/g, ''), 10);
-            balance += amountWon;
-            updateBalanceDisplay();
-        }
-    }
-
     requestAnimationFrame((timestamp) => animateSpin(timestamp));
+}
+
+function finalizeSpin() {
+    const winningIndex = Math.floor((currentAngle / sliceAngle) + 0.5) % segments.length; // Adjusted for text alignment
+    const winningSegment = segments[winningIndex];
+    resultText.textContent = `You won ${winningSegment}!`;
+
+    // Update balance if won store credit
+    if (winningSegment.includes('Store Credit')) {
+        const amountWon = parseInt(winningSegment.replace(/\D/g, ''), 10);
+        balance += amountWon;
+        updateBalanceDisplay();
+    }
 }
 
 spinBtn.addEventListener('click', spinWheel);
