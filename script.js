@@ -1,57 +1,35 @@
-const canvas = document.getElementById('wheelCanvas');
-const ctx = canvas.getContext('2d');
-const spinBtn = document.getElementById('spinBtn');
-
-const segments = ['Prize 1', 'Prize 2', 'Prize 3', 'Prize 4', 'Prize 5'];
-const colors = ['#EAD637', '#F7811F', '#E74B3C', '#C2185A', '#881798'];
-let angle = 0;
-
-function drawWheel() {
-    const sliceAngle = (2 * Math.PI) / segments.length;
-    
-    segments.forEach((seg, index) => {
-        ctx.beginPath();
-        ctx.moveTo(250, 250); // Wheel center
-        ctx.arc(250, 250, 250, angle, angle + sliceAngle);
-        ctx.fillStyle = colors[index % colors.length];
-        ctx.fill();
-
-        // Draw segment text
-        ctx.translate(250, 250);
-        ctx.rotate(angle + sliceAngle / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = "18px Arial";
-        ctx.fillText(seg, 225, 10);
-        ctx.rotate(-(angle + sliceAngle / 2));
-        ctx.translate(-250, -250);
-
-        angle += sliceAngle;
-    });
+function drawArrow() {
+  ctx.fillStyle = "#333";
+  ctx.beginPath();
+  ctx.moveTo(250, 50); // Arrow tip (above the center top of the wheel)
+  ctx.lineTo(230, 90); // Bottom left of the arrow
+  ctx.lineTo(270, 90); // Bottom right of the arrow
+  ctx.closePath();
+  ctx.fill();
 }
 
 function spinWheel() {
-    const spinTo = Math.random() * 7200; // Spin the wheel multiple rounds
-    let currentAngle = angle;
+  spinBtn.disabled = true;
+  let spinTime = 0;
+  const spinTotalTime = Math.random() * 5000 + 10000; // Between 10 and 15 seconds for more anticipation
 
-    const spinAnimation = setInterval(() => {
-        currentAngle += 10;
-        ctx.clearRect(0, 0, 500, 500);
-        ctx.save();
-        ctx.translate(250, 250);
-        ctx.rotate(currentAngle * Math.PI / 180);
-        ctx.translate(-250, -250);
-        drawWheel();
-        ctx.restore();
+  const spinAnimation = setInterval(() => {
+    spinTime += 30;
+    currentAngle += sliceAngle / 30; // Slower spin increment
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    drawWheel();
+    drawArrow(); // Draw the arrow each time so it remains static
 
-        if (currentAngle >= spinTo) {
-            clearInterval(spinAnimation);
-            // Logic to determine the landed segment can go here
-        }
-    }, 10);
+    if (spinTime >= spinTotalTime) {
+      clearInterval(spinAnimation);
+      spinBtn.disabled = false;
+      // Determine the prize
+      const winningIndex = Math.floor(prizes.length - (currentAngle / (2 * Math.PI)) % prizes.length) % prizes.length;
+      resultText.innerText = `Congratulations! You've won ${prizes[winningIndex]}`;
+    }
+  }, 30);
 }
 
-spinBtn.addEventListener('click', spinWheel);
-
-// Initial draw
+// Initial draw of the wheel and arrow
 drawWheel();
+drawArrow();
