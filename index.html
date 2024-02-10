@@ -6,7 +6,57 @@
     <title>ELYTEWEAR Spin & Win</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+            padding-bottom: 20px;
+        }
+        .container {
+            max-width: 400px;
+        }
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #wheelCanvas {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #dee2e6;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+        .arrow {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: solid #000;
+            border-width: 0 10px 15px 10px;
+            border-color: transparent transparent #000 transparent;
+        }
+        .code-entry input {
+            max-width: 200px;
+            display: inline-block;
+        }
+        .code-entry button {
+            vertical-align: top;
+        }
+        .btn-lg {
+            font-size: 1rem;
+            padding: .5rem 1rem;
+        }
+        #resultText {
+            font-size: 1.2rem;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .balance-text {
+            font-size: 1.1rem;
+            color: #17a2b8;
+        }
+    </style>
 </head>
 <body>
     <div class="container text-center mt-5">
@@ -14,12 +64,12 @@
         <p>Enter the code "money" to load your balance and try your luck!</p>
 
         <div class="code-entry mb-4">
-            <input type="text" id="codeInput" class="form-control mr-2" placeholder="Enter Code" />
+            <input type="text" id="codeInput" class="form-control mr-2" placeholder="Enter Code">
             <button id="submitCodeBtn" class="btn btn-primary">Submit Code</button>
         </div>
 
         <div class="wheel-container mx-auto">
-            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+            <canvas id="wheelCanvas"></canvas>
             <div class="arrow"></div>
         </div>
 
@@ -31,4 +81,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
