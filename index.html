@@ -11,55 +11,49 @@
             font-family: 'Montserrat', sans-serif;
             background-color: #f8f9fa;
             padding-bottom: 20px;
+            margin: 0;
+            overflow-x: hidden; /* Prevents horizontal scrolling */
         }
         .container {
             max-width: 400px;
+            margin: auto;
+            padding-top: 20px;
         }
         .wheel-container {
             position: relative;
             width: 100%;
-            margin-top: 20px;
+            max-width: 300px; /* Adjusted for mobile screens */
+            margin: 20px auto; /* Centers the wheel container */
         }
         #wheelCanvas {
-            max-width: 100%;
-            height: auto;
-            border: 2px solid #dee2e6;
-            border-radius: 50%;
+            width: 100%; /* Ensures the canvas is responsive */
+            border-radius: 50%; /* Makes the canvas circular */
             background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for depth */
         }
         .arrow {
             position: absolute;
-            top: -10px;
+            top: -10px; /* Adjusted to ensure it doesn't overlay the wheel */
             left: 50%;
             transform: translateX(-50%);
             border: solid #000;
             border-width: 0 10px 15px 10px;
             border-color: transparent transparent #000 transparent;
+            z-index: 10; /* Ensures the arrow is above the wheel */
         }
-        .code-entry input {
-            max-width: 200px;
-            display: inline-block;
-        }
-        .code-entry button {
-            vertical-align: top;
-        }
-        .btn-lg {
-            font-size: 1rem;
-            padding: .5rem 1rem;
-        }
-        #resultText {
-            font-size: 1.2rem;
-            color: #28a745;
+        /* Additional styles for button and text for better visibility on mobile */
+        #spinBtn {
+            margin-top: 20px;
             font-weight: bold;
         }
-        .balance-text {
-            font-size: 1.1rem;
-            color: #17a2b8;
+        #resultText, #balanceText {
+            margin-top: 15px;
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
-    <div class="container text-center mt-5">
+    <div class="container text-center">
         <h1>ELYTEWEAR Spin & Win</h1>
         <p>Enter the code "money" to load your balance and try your luck!</p>
 
@@ -68,14 +62,14 @@
             <button id="submitCodeBtn" class="btn btn-primary">Submit Code</button>
         </div>
 
-        <div class="wheel-container mx-auto">
-            <canvas id="wheelCanvas"></canvas>
+        <div class="wheel-container">
+            <canvas id="wheelCanvas" width="300" height="300"></canvas>
             <div class="arrow"></div>
         </div>
 
-        <button id="spinBtn" class="btn btn-success btn-lg mt-3">Spin ($25)</button>
-        <div id="resultText" class="mt-3"></div>
-        <div id="balanceText" class="balance-text mt-2">Balance: $0</div>
+        <button id="spinBtn" class="btn btn-success btn-lg">Spin ($25)</button>
+        <div id="resultText"></div>
+        <div id="balanceText" class="balance-text">Balance: $0</div>
     </div>
 
     <script src="script.js"></script>
