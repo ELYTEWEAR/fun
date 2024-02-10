@@ -1,106 +1,91 @@
 body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    color: #333;
     display: flex;
+    flex-direction: column; /* Stack elements vertically */
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #f5f5f5;
+    min-height: 100vh; /* Minimum height to fill the screen */
+}
+
+.container {
+    width: 100%;
+    max-width: 700px; /* Maximum container width */
+    padding: 20px; /* Padding around the content */
+    box-sizing: border-box; /* Include padding in the width calculation */
 }
 
 .wheel-container {
-    text-align: center;
-}
-
-#spinBtn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-.wheel-container {
-  position: relative;
+    position: relative;
+    width: 90%; /* Responsive width */
+    max-width: 300px; /* Maximum wheel size */
+    margin: 0 auto;
 }
 
 #wheelCanvas {
-  margin-top: 40px; // Make room for the arrow above the wheel
-}
-body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-.container {
-    max-width: 700px;
-}
-
-.wheel-container {
-    margin: 0 auto;
-    position: relative;
-}
-
-.arrow {
-    color: #333;
-    font-size: 30px;
-    font-weight: bold;
-    user-select: none;
-}
-
-#resultText {
-    font-size: 24px;
-    color: #28a745; /* Success color */
-}
-
-#balanceText {
-    font-size: 20px;
-    color: #007bff; /* Primary color */
-}
-
-#spinBtn {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-#spinBtn:hover {
-body {
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
-    margin: 0;
-}
-
-.container {
-    text-align: center;
-}
-
-.wheel-container {
-    position: relative;
-    margin: 20px auto;
+    width: 100%; /* Make the canvas responsive */
+    margin-top: 10px; /* Adjust based on arrow size */
 }
 
 .arrow {
     position: absolute;
-    top: -10px;
+    top: -20px; /* Position above the wheel */
     left: 50%;
     transform: translateX(-50%);
     font-size: 24px;
     color: #333;
+    user-select: none; /* Prevent text selection */
 }
 
 .btn {
-    margin: 10px;
     padding: 10px 20px;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     background-color: #007bff;
     color: white;
     cursor: pointer;
+    outline: none; /* Remove outline on focus */
+    display: inline-block; /* Allow margin */
+    margin: 10px;
 }
 
-.btn:hover {
+.btn:hover,
+.btn:focus {
     background-color: #0056b3;
+    border-color: #004085;
+}
+
+.code-entry {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Wrap on small screens */
+    gap: 10px; /* Space between input and button */
+}
+
+#codeInput {
+    padding: 10px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    flex-grow: 1; /* Allow input to grow */
+    max-width: calc(100% - 120px); /* Limit width accounting for button */
+}
+
+#submitCodeBtn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 2px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+#submitCodeBtn:hover {
+    background-color: #0056b3;
+    border-color: #004085;
 }
 
 #resultText {
@@ -114,24 +99,3 @@ body {
     font-size: 18px;
     color: #000;
 }
-
-    background-color: #0056b3;
-    border-color: #004085;
-}
-.code-entry {
-    margin: 20px 0;
-    display: flex;
-    justify-content: center;
-}
-
-#codeInput {
-    padding: 10px;
-    margin-right: 10px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-}
-
-#submitCodeBtn {
-    /* Button styles similar to .btn */
-}
-
